@@ -1,13 +1,15 @@
-﻿namespace CashMachineTask.Abstract
+﻿using System.Collections;
+
+namespace CashMachineTask.Abstract
 {
-    internal interface ICassette<T> where T : ICurrency
-    {
-        T StoredCurrency { get; }
+	internal interface ICassette<T>
+	{
+		int Quantity { get; }
 
-        int Quantity { get; }
+		int Capacity { get; }
 
-        int Capacity { get; }
+		bool TryAdd(T[] values);
 
-        bool AddBanknots(int currencyCount);
-    }
+		bool TryPull(int count, out T[] values);
+	}
 }
