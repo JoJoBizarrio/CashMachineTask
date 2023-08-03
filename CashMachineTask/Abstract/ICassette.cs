@@ -11,5 +11,7 @@ namespace CashMachineTask.Abstract
 		bool TryAdd(T[] values);
 
 		bool TryPull(int count, out T[] values);
+
+		string GetInfo();
 	}
 }

@@ -64,5 +64,10 @@ namespace CashMachineTask.Model
 			values = Array.Empty<T>();
 			return false;
 		}
+
+		public string GetInfo()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

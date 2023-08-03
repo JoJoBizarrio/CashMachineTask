@@ -6,7 +6,34 @@
         xmlns:local="clr-namespace:CashMachineTask.View"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Width" Value="120"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
     <Grid>
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="49*"/>
+            <ColumnDefinition Width="51*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBox Text="" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <StackPanel Grid.Column="1">
+            <TextBox x:Name="InputTextBox"  Text="Cash amount" TextWrapping="Wrap" Width="120"/>
+            <Button x:Name="DepositeButton" Content="Deposite"/>
+            <Button x:Name="WithdrawalButton" Content="Withdrawal"/>
+        </StackPanel>
     </Grid>
 </Window>

@@ -33,5 +33,10 @@ namespace CashMachineTask.Model
 		{
 			throw new NotImplementedException();
 		}
+
+		public string GetInfo()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
