@@ -2,13 +2,13 @@
 
 namespace CashMachineTask.Model
 {
-	public class Currency
-	{
-		public string Title { get; }
+    public class Currency : ICurrency
+    {
+        public string Title { get; }
 
-		public Currency(string title)
-		{
-			Title = title;
-		}
-	}
+        public Currency(string title)
+        {
+            Title = title;
+        }
+    }
 }

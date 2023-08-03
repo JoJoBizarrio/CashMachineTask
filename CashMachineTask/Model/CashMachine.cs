@@ -5,29 +5,42 @@ using System.Linq;
 
 namespace CashMachineTask.Model
 {
-	internal class CashMachine : ICashMachine
-	{
-		public decimal Cash { get; private set; }
+    internal class CashMachine : ICashMachine
+    {
+        public decimal Balance => _cassettes.Sum(cassette => cassette.Balance);
 
-		private readonly int _cassettesDefultMaxCount = 4;
-		private readonly ICassette<ICash>[] _cassettes;
-		private readonly ICash[] _supportedCash;
+        private readonly int _cassettesDefultMaxCount = 4;
+        private readonly ICassette[] _cassettes;
+        private readonly IDictionary<ICurrency, decimal[]> _supportedCash;
+        private readonly decimal[] _supDenom;
 
-		public CashMachine(IEnumerable<ICash> supportedCash, int cassetteCapacity)
-		{
-			_cassettes = new ICassette<ICash>[_cassettesDefultMaxCount];
-			_supportedCash = supportedCash.ToArray();
+        public CashMachine(IDictionary<ICurrency, decimal[]> currencyKeyDenominationsValuesDictionary, int cassetteCapacity) // heavy ctor, maybe factory?
+        {
+            _cassettes = new ICassette[_cassettesDefultMaxCount];
+            _supportedCash = currencyKeyDenominationsValuesDictionary;
 
-			for (int i = 0; i < _cassettesDefultMaxCount; i++)
-			{
-				_cassettes[i] = new Cassette<ICash>(_supportedCash[i], cassetteCapacity);
-			}
-		}
+            var supportedCurrency = _supportedCash.Keys.ToArray();
 
-		public bool Deposite(IEnumerable<ICash> cash)
-		{
-			throw new NotImplementedException();
-		}
+            for (int i = 0; i < _cassettesDefultMaxCount; i++)
+            {
+                for (int j = 0; j < _supportedCash[supportedCurrency[i]].Length; j++)
+                {
+                    _cassettes[i] = new Cassette(supportedCurrency[i], _supportedCash[supportedCurrency[i]][j], cassetteCapacity);
+                }
+            }
+        }
+
+        public bool Deposite(IEnumerable<ICash> cash)
+        {
+            throw new NotImplementedException();
+
+        }
+
+        private bool Deposite(decimal denomination, int count)
+        {
+            throw new NotImplementedException();
+
+        }
 
 		public IEnumerable<ICash> Withdrawal(int totalSum)
 		{

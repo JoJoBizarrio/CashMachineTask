@@ -7,18 +7,18 @@ using CashMachineTask.Abstract;
 
 namespace CashMachineTask.Model
 {
-	internal class Cash : ICash
-	{
-		public Guid SerialNumber { get; } = new Guid();
+    internal class Cash : ICash
+    {
+        public Guid SerialNumber { get; } = new Guid();
 
-		public Currency Currency { get; }
+        public ICurrency Currency { get; }
 
-		public decimal Denomination { get; }
+        public decimal Denomination { get; }
 
-		public Cash(Currency currency, decimal denomination)
-		{
-			Currency = currency;
-			Denomination = denomination;
-		}
-	}
+        public Cash(ICurrency currency, decimal denomination)
+        {
+            Currency = currency;
+            Denomination = denomination;
+        }
+    }
 }

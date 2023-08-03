@@ -3,12 +3,12 @@ using System;
 
 namespace CashMachineTask.Abstract
 {
-	internal interface ICash
-	{
-		public Guid SerialNumber { get; }
+    internal interface ICash
+    {
+        public Guid SerialNumber { get; }
 
-		public Currency Currency { get; }
+        public ICurrency Currency { get; }
 
-		public decimal Denomination { get; }
-	}
+        public decimal Denomination { get; }
+    }
 }

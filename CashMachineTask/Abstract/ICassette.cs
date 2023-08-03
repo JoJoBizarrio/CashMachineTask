@@ -2,16 +2,17 @@
 
 namespace CashMachineTask.Abstract
 {
-	internal interface ICassette<T>
-	{
-		int Quantity { get; }
+    internal interface ICassette
+    {
+        int Quantity { get; }
+        int Capacity { get; }
+        bool IsFull { get; }
+        decimal Balance { get; }
 
-		int Capacity { get; }
+        ICurrency StoredCurrency { get; }
+        decimal StoredDenomination { get; }
 
-		bool TryAdd(T[] values);
-
-		bool TryPull(int count, out T[] values);
-
-		string GetInfo();
-	}
+        bool TryAdd(ICash[] values);
+        bool TryPull(int count, out ICash[] values);
+    }
 }

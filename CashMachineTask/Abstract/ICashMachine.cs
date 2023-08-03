@@ -4,7 +4,7 @@ namespace CashMachineTask.Abstract
 {
 	internal interface ICashMachine
 	{
-		decimal Cash { get; }
+		decimal Balance { get; }
 
 		bool Deposite(IEnumerable<ICash> cash);
 
