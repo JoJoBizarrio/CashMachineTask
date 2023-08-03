@@ -12,7 +12,7 @@ namespace CashMachineTask
 		public string Info
 		{
 			get => _info;
-			set => Set(ref _info, _cashMachine.GetInfo());
+			set => Set(ref _info, _cashMachine.ToString());
 		}
 
 		public MainWindowViewModel(ICashMachine cashMachine)

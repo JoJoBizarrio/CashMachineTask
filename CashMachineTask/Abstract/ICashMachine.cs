@@ -9,7 +9,5 @@ namespace CashMachineTask.Abstract
 		bool Deposite(IEnumerable<ICash> cash);
 
 		IEnumerable<ICash> Withdrawal(int totalSum);
-
-		public string GetInfo();
 	}
 }
