@@ -1,68 +1,65 @@
 ﻿using CashMachineTask.Abstract;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Windows.Documents;
 
 namespace CashMachineTask.Model
 {
-	internal class Cassette<T> : ICassette<T> where T : ICash
-	{
-		public string Currency { get; }
+    internal class Cassette : ICassette
+    {
+        public ICurrency StoredCurrency { get; }
+        public decimal StoredDenomination { get; }
 
-		public decimal Denomination { get; }
+        public int Quantity { get; private set; }
+        public int Capacity { get; }
+        public bool IsFull => Quantity == Capacity;
+        public decimal Balance => Quantity * StoredDenomination;
 
-		public int Quantity { get; private set; }
+        private List<ICash> _storege { get; set; }
 
-		public int Capacity { get; }
+        public Cassette(ICurrency currency, decimal denomination, int capacity)
+        {
+            Capacity = capacity;
+            StoredCurrency = currency;
+            StoredDenomination = denomination;
+            _storege = new List<ICash>(capacity);
+        }
 
-		private List<T> _storege { get; set; }
+        public bool TryAdd(ICash[] values)
+        {
+            var count = values.Length;
 
-		public Cassette(T cash, int capacity)
-		{
-			Currency = cash.Currency.Title;
-			Denomination = cash.Denomination;
-			Capacity = capacity;
+            if (Quantity + count <= Capacity)
+            {
+                foreach (Cash value in values)
+                {
+                    _storege.Add(value);
+                }
 
-			_storege = new List<T>(capacity);
-		}
+                Quantity += count;
+                return true;
+            }
 
-		public bool TryAdd(T[] values)
-		{
-			var count = values.Length;
+            return false;
+        }
 
-			if (Quantity + count <= Capacity)
-			{
-				foreach (T value in values)
-				{
-					_storege.Add(value);
-				}
+        public bool TryPull(int count, out ICash[] values)
+        {
+            if (Quantity - count >= 0)
+            {
+                values = new Cash[count];
 
-				Quantity += count;
-				return true;
-			}
+                for (int i = 0; i < count; i++)
+                {
+                    values[i] = _storege[i];
+                }
 
-			return false;
-		}
+                _storege.RemoveRange(0, count);
+                Quantity -= count;
+                return true;
+            }
 
-		public bool TryPull(int count, out T[] values)
-		{
-			if (Quantity - count >= 0)
-			{
-				values = new T[count];
-
-				for (int i = 0; i < count; i++)
-				{
-					values[i] = _storege[i];
-				}
-
-				_storege.RemoveRange(0, count);
-				Quantity -= count;
-				return true;
-			}
-
-			values = Array.Empty<T>();
-			return false;
-		}
-	}
+            values = Array.Empty<Cash>();
+            return false;
+        }
+    }
 }
