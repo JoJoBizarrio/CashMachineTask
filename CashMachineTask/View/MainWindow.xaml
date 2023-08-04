@@ -23,6 +23,7 @@
             <Setter Property="Margin" Value="3,3,3,3"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="MinWidth" Value="120"/>
         </Style>
         <Style TargetType="StackPanel">
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -42,10 +43,9 @@
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBox x:Name="TrayCashSumTextBox" 
-                                 Text="{Binding TrayCashSum, ValidatesOnDataErrors=True}"
+                                 Text="{Binding TrayCashSum, Mode=OneWay}"
                                  IsReadOnly="True"
-                                 Height="23"
-                                 MinWidth="120">
+                                 Height="23">
 
                         </TextBox>
                         <Button x:Name="DepositButton" Content="Deposit" Command="{Binding Deposit}"/>
@@ -89,11 +89,12 @@
             </TabItem>
 
             <TabItem Header="Withdrawal">
-                <StackPanel>
+                <StackPanel HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
-                        <TextBox x:Name="InputTextBox" Text="{Binding WithdrawalSum, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                        <Button x:Name="WithdrawalButton" Content="Withdrawal" Command="{Binding Withdrawal}"/>
-                        <Button x:Name="ClearButton" Content="Clear"/>
+                        <TextBox x:Name="InputTextBox" 
+                                 Text="{Binding WithdrawalSum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                        <Button x:Name="WithdrawalButton" Content="Withdrawal" CommandParameter="{Binding ElementName=InputTextBox, Path=Text}" Command="{Binding Withdrawal}" />
+                        <Button x:Name="ClearButton" Content="Clear" Command="{Binding Clear}"/>
                     </StackPanel>
 
                 </StackPanel>

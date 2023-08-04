@@ -11,11 +11,15 @@ using System.Windows.Navigation;
 
 namespace CashMachineTask
 {
-	internal class MainWindowViewModel : ViewModelBase, IDataErrorInfo
+	internal class MainWindowViewModel : ViewModelBase
 	{
-		private readonly ICashMachine _cashMachine;
+		public MainWindowViewModel(ICashMachine cashMachine)
+		{
+			_tray = new List<ICash>();
+			_cashMachine = cashMachine;
+		}
 
-		private readonly List<ICash> _tray;
+		private readonly ICashMachine _cashMachine;
 
 		private string _info;
 		public string Info
@@ -24,19 +28,16 @@ namespace CashMachineTask
 			set => Set(ref _info, _cashMachine.ToString());
 		}
 
-		public List<decimal> SupportedDenomination => _cashMachine.SupportedDenomination.ToList();
+		#region Deposit
+		private readonly List<ICash> _tray;
 
-		public MainWindowViewModel(ICashMachine cashMachine)
-		{
-			_tray = new List<ICash>();
-			_cashMachine = cashMachine;
-		}
+		public List<decimal> SupportedDenomination => _cashMachine.SupportedDenomination.ToList();
 
 		private decimal _trayCashSum;
 		public decimal TrayCashSum
 		{
 			get => _tray.Sum(cash => cash.Denomination);
-			set => Set(ref _trayCashSum, value);
+			set { }
 		}
 
 		private IRelayCommand _deposit;
@@ -99,62 +100,42 @@ namespace CashMachineTask
 		public IRelayCommand<object> OnSelectionChangedRaiseCanExecute =>
 			_onSelectionChangedRaiseCanExecute ??= new RelayCommand<object>(obj => { RaiseCanExecuteChanged(); });
 
-		public string Error => throw new NotImplementedException();
-
-		public string this[string columnName]
-		{
-			get
-			{
-				string error = String.Empty;
-				switch (columnName)
-				{
-					case "TrayCashSum":
-						if (_tray.Count > 2)
-						{
-							error = "Возраст должен быть больше 0 и меньше 100";
-						}
-						break;
-
-					case "WithdrawalSum":
-						if (!decimal.TryParse(WithdrawalSum, out decimal res))
-						{
-							_isEnableWithdrawal = false;
-						}
-						else
-						{
-							_isEnableWithdrawal = true;
-						}
-
-						Withdrawal.NotifyCanExecuteChanged();
-						break;
-				}
-				return error;
-			}
-		}
-
 		public void RaiseCanExecuteChanged()
 		{
 			PickUp.NotifyCanExecuteChanged();
 			OnPropertyChanged(nameof(TrayCashSum));
 			OnPropertyChanged(nameof(Info));
 		}
+		#endregion
 
-		private string _w;
+		#region Withdrawal
+		private string _withdrawalSum;
 		public string WithdrawalSum
 		{
-			get => _w;
-			set => Set(ref _w, value);
+			get => _withdrawalSum;
+			set
+			{
+				Set(ref _withdrawalSum, value);
+				Withdrawal.NotifyCanExecuteChanged();
+			}
 		}
-
-		private bool _isEnableWithdrawal = true;
 
 		private IRelayCommand<object> _withdrawal;
 		public IRelayCommand<object> Withdrawal => _withdrawal ??= new RelayCommand<object>(obj =>
 		{
 
 		},
-			obj => { return _isEnableWithdrawal; });
+		obj =>
+		{
+			if (obj != null && decimal.TryParse((string)obj, out decimal res))
+			{
+				return true;
+			}
+			return false;
+		});
 
-
+		private IRelayCommand _clear;
+		public IRelayCommand Clear => _clear ??= new RelayCommand(() => WithdrawalSum = null);
+		#endregion
 	}
 }
