@@ -114,6 +114,19 @@ namespace CashMachineTask
 							error = "Возраст должен быть больше 0 и меньше 100";
 						}
 						break;
+
+					case "WithdrawalSum":
+						if (!decimal.TryParse(WithdrawalSum, out decimal res))
+						{
+							_isEnableWithdrawal = false;
+						}
+						else
+						{
+							_isEnableWithdrawal = true;
+						}
+
+						Withdrawal.NotifyCanExecuteChanged();
+						break;
 				}
 				return error;
 			}
@@ -125,5 +138,23 @@ namespace CashMachineTask
 			OnPropertyChanged(nameof(TrayCashSum));
 			OnPropertyChanged(nameof(Info));
 		}
+
+		private string _w;
+		public string WithdrawalSum
+		{
+			get => _w;
+			set => Set(ref _w, value);
+		}
+
+		private bool _isEnableWithdrawal = true;
+
+		private IRelayCommand<object> _withdrawal;
+		public IRelayCommand<object> Withdrawal => _withdrawal ??= new RelayCommand<object>(obj =>
+		{
+
+		},
+			obj => { return _isEnableWithdrawal; });
+
+
 	}
 }

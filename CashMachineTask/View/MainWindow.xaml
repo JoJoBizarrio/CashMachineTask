@@ -91,7 +91,8 @@
             <TabItem Header="Withdrawal">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Button x:Name="WithdrawalButton" Content="Withdrawal"/>
+                        <TextBox x:Name="InputTextBox" Text="{Binding WithdrawalSum, ValidatesOnDataErrors=True, NotifyOnValidationError=True, ValidatesOnExceptions=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                        <Button x:Name="WithdrawalButton" Content="Withdrawal" Command="{Binding Withdrawal}"/>
                         <Button x:Name="ClearButton" Content="Clear"/>
                     </StackPanel>
 
