@@ -1,46 +1,129 @@
 ﻿using CashMachineTask.Abstract;
+using CashMachineTask.Model;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using System.Windows.Documents;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace CashMachineTask
 {
-    internal class MainWindowViewModel : ViewModelBase
-    {
-        private readonly ICashMachine _cashMachine;
+	internal class MainWindowViewModel : ViewModelBase, IDataErrorInfo
+	{
+		private readonly ICashMachine _cashMachine;
 
-        private string _info;
-        public string Info
-        {
-            get => _info;
-            set => Set(ref _info, _cashMachine.ToString());
-        }
+		private readonly List<ICash> _tray;
 
-        public List<decimal> SupportedDenomination => _cashMachine.SupportedDenomination.ToList();
+		private string _info;
+		public string Info
+		{
+			get => _cashMachine.ToString();
+			set => Set(ref _info, _cashMachine.ToString());
+		}
 
-        public MainWindowViewModel(ICashMachine cashMachine)
-        {
-            _cashMachine = cashMachine;
-            OnPropertyChanged(nameof(Info));
-        }
+		public List<decimal> SupportedDenomination => _cashMachine.SupportedDenomination.ToList();
 
-        private IRelayCommand _deposite;
+		public MainWindowViewModel(ICashMachine cashMachine)
+		{
+			_tray = new List<ICash>();
+			_cashMachine = cashMachine;
+		}
 
-        public IRelayCommand<decimal> Deposite
-        {
-            get
-            {
-                return (IRelayCommand<decimal>)(_deposite ??= new RelayCommand<decimal>(input => // wtf? (IRelayCommand<decimal>) why?
-                {
-                    throw new NotImplementedException(); //_cashMachine.Deposite(input);
-                },
-                input =>
-                {
-                    return false;
-                }));
-            }
-        }
-    }
+		private decimal _trayCashSum;
+		public decimal TrayCashSum
+		{
+			get => _tray.Sum(cash => cash.Denomination);
+			set => Set(ref _trayCashSum, value);
+		}
+
+		private IRelayCommand _deposit;
+		public IRelayCommand<object> Deposit
+		{
+			get
+			{
+				return (IRelayCommand<object>)(_deposit ??= new RelayCommand<object>(obj => // wtf? (IRelayCommand<decimal>) why?
+				{
+					_cashMachine.Deposite(_tray);
+					_tray.Clear();
+					RaiseCanExecuteChanged();
+				},
+
+				obj =>
+				{
+					return true;
+				}));
+			}
+		}
+
+		private IRelayCommand _pullAll;
+		public IRelayCommand PullAll => _pullAll ??= new RelayCommand(() =>
+		{
+			_tray.Clear();
+			RaiseCanExecuteChanged();
+		});
+
+		private IRelayCommand<object> _lower;
+		public IRelayCommand<object> Lower => _lower ??= new RelayCommand<object>(obj =>
+		{
+			if (obj != null && obj is decimal denomination)
+			{
+				_tray.Add(new Cash(null, denomination));
+				RaiseCanExecuteChanged();
+			}
+		});
+
+		private IRelayCommand<object> _pickUp;
+		public IRelayCommand<object> PickUp => _pickUp ??= new RelayCommand<object>(obj =>
+		{
+			if (obj != null && obj is decimal denomination)
+			{
+				_tray.Remove(_tray.First(cash => cash.Denomination == denomination));
+				RaiseCanExecuteChanged();
+			}
+		},
+
+		obj =>
+		{
+			if (obj != null && obj is decimal denomination)
+			{
+				return _tray.Any(cash => cash.Denomination == denomination);
+			}
+
+			return false;
+		});
+
+		public IRelayCommand<object> _onSelectionChangedRaiseCanExecute;
+		public IRelayCommand<object> OnSelectionChangedRaiseCanExecute =>
+			_onSelectionChangedRaiseCanExecute ??= new RelayCommand<object>(obj => { RaiseCanExecuteChanged(); });
+
+		public string Error => throw new NotImplementedException();
+
+		public string this[string columnName]
+		{
+			get
+			{
+				string error = String.Empty;
+				switch (columnName)
+				{
+					case "TrayCashSum":
+						if (_tray.Count > 2)
+						{
+							error = "Возраст должен быть больше 0 и меньше 100";
+						}
+						break;
+				}
+				return error;
+			}
+		}
+
+		public void RaiseCanExecuteChanged()
+		{
+			PickUp.NotifyCanExecuteChanged();
+			OnPropertyChanged(nameof(TrayCashSum));
+			OnPropertyChanged(nameof(Info));
+		}
+	}
 }
