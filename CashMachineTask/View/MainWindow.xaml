@@ -5,35 +5,53 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CashMachineTask.View"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="400"
+        FontSize="16">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Width" Value="120"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="3,3,3,3"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="MinWidth" Value="120"/>
         </Style>
         <Style TargetType="TextBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Margin" Value="3,3,3,3"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="StackPanel">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
     </Window.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="49*"/>
-            <ColumnDefinition Width="51*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBox Text="" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-        <StackPanel Grid.Column="1">
-            <TextBox x:Name="InputTextBox"  Text="Cash amount" TextWrapping="Wrap" Width="120"/>
-            <Button x:Name="DepositeButton" Content="Deposite"/>
-            <Button x:Name="WithdrawalButton" Content="Withdrawal"/>
+        <StackPanel Grid.Row="1">
+            <TextBox x:Name="InputTextBox" HorizontalContentAlignment="Center" Text="" IsEnabled="False" Height="23"/>
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="DepositeButton" Content="Deposite"/>
+                <Button x:Name="WithdrawalButton" Content="Withdrawal"/>
+                <Button x:Name="ClearButton" Content="Clear"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="AddButton" Width="140" Content="{Binding ElementName=DenomiantionListBox, Path=SelectedItem}" ContentStringFormat="Add: {0}"/>
+                <Button x:Name="RemoveButton" Width="140" Content="{Binding ElementName=DenomiantionListBox, Path=SelectedItem}" ContentStringFormat="Pick up: {0}"/>
+            </StackPanel>
+
+            <ListBox x:Name="DenomiantionListBox" ItemsSource="{Binding SupportedDenomination}" SelectedIndex="0" HorizontalContentAlignment="Center">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
     </Grid>
 </Window>

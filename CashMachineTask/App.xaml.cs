@@ -1,10 +1,9 @@
-﻿using CashMachineTask.View;
+﻿using CashMachineTask.Abstract;
+using CashMachineTask.Model;
+using CashMachineTask.View;
 using NLog;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -20,6 +19,9 @@ namespace CashMachineTask
         protected override void OnStartup(StartupEventArgs e)
         {
             MainWindow mainWindow = new MainWindow();
+            var cassettesList = new List<Cassette>() { new Cassette(null, 100, 20), new Cassette(null, 500, 30), new Cassette(null, 1000, 20)};
+            var cashMachine = new CashMachine(cassettesList);
+            mainWindow.DataContext = new MainWindowViewModel(cashMachine);
             mainWindow.Show();
 
             SetupExceptionHandling();
