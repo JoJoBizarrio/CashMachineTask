@@ -1,6 +1,7 @@
 ﻿using CashMachineTask.Abstract;
 using CashMachineTask.Model;
 using CommunityToolkit.Mvvm.Input;
+using DevExpress.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +12,7 @@ using System.Windows.Navigation;
 
 namespace CashMachineTask
 {
-	internal class MainWindowViewModel : ViewModelBase
+	internal class MainWindowViewModel : DevExpress.Mvvm.ViewModelBase
 	{
 		public MainWindowViewModel(ICashMachine cashMachine)
 		{
@@ -19,13 +20,15 @@ namespace CashMachineTask
 			_cashMachine = cashMachine;
 		}
 
+		private IDialogService _dialogService { get { return GetService<IDialogService>(); } }
+
 		private readonly ICashMachine _cashMachine;
 
 		private string _info;
 		public string Info
 		{
 			get => _cashMachine.ToString();
-			set => Set(ref _info, _cashMachine.ToString());
+			set => SetProperty(ref _info, value, Info);
 		}
 
 		#region Deposit
