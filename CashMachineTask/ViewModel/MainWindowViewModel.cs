@@ -1,7 +1,6 @@
 ﻿using CashMachineTask.Abstract;
 using CashMachineTask.Model;
 using CommunityToolkit.Mvvm.Input;
-using DevExpress.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,15 +11,16 @@ using System.Windows.Navigation;
 
 namespace CashMachineTask
 {
-	internal class MainWindowViewModel : DevExpress.Mvvm.ViewModelBase
+	internal class MainWindowViewModel : ViewModelBase
 	{
-		public MainWindowViewModel(ICashMachine cashMachine)
+		public MainWindowViewModel(ICashMachine cashMachine, IWindowService windowService)
 		{
 			_tray = new List<ICash>();
 			_cashMachine = cashMachine;
+			_windowService = windowService;
 		}
 
-		private IDialogService _dialogService { get { return GetService<IDialogService>(); } }
+		private readonly IWindowService _windowService;
 
 		private readonly ICashMachine _cashMachine;
 
@@ -28,7 +28,7 @@ namespace CashMachineTask
 		public string Info
 		{
 			get => _cashMachine.ToString();
-			set => SetProperty(ref _info, value, Info);
+			//set => SetProperty(ref _info, );
 		}
 
 		#region Deposit
@@ -138,7 +138,7 @@ namespace CashMachineTask
 		});
 
 		private IRelayCommand _clear;
-		public IRelayCommand Clear => _clear ??= new RelayCommand(() => WithdrawalSum = null);
+		public IRelayCommand Clear => _clear ??= new RelayCommand(() => WithdrawalSum = "");
 		#endregion
 	}
 }

@@ -9,6 +9,7 @@
         Title="MainWindow" Height="450" Width="400"
         FontSize="16">
     <Window.Resources>
+        <local:SelectorCashDialog x:Key="dialog" />
         <Style TargetType="Button">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>

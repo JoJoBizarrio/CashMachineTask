@@ -17,9 +17,9 @@ namespace CashMachineTask.View
 	/// <summary>
 	/// Логика взаимодействия для SlectorCashDilalog.xaml
 	/// </summary>
-	public partial class SelectorCashDilalog : Window
+	public partial class SelectorCashDialog : Window
 	{
-		public SelectorCashDilalog()
+		public SelectorCashDialog()
 		{
 			InitializeComponent();
 		}

@@ -21,7 +21,7 @@ namespace CashMachineTask
             MainWindow mainWindow = new MainWindow();
             var cassettesList = new List<Cassette>() { new Cassette(null, 100, 20), new Cassette(null, 500, 30), new Cassette(null, 1000, 20)};
             var cashMachine = new CashMachine(cassettesList);
-            mainWindow.DataContext = new MainWindowViewModel(cashMachine);
+            mainWindow.DataContext = new MainWindowViewModel(cashMachine, null);
             mainWindow.Show();
 
             SetupExceptionHandling();
