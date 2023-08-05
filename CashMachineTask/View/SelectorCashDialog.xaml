@@ -4,13 +4,42 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CashMachineTask.View"
+        xmlns:vm="clr-namespace:CashMachineTask.VIewModel"
         mc:Ignorable="d"
-        Title="SelectorCashDialog" Height="200" Width="400">
+        Title="SelectorCashDialog" Height="200" Width="400"
+        WindowStartupLocation="CenterOwner" 
+        FontSize="16"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        x:Name="SelectorCashDialogWindow"
+        >
+
+    <Window.Resources>
+        <local:MainWindow x:Key="other"></local:MainWindow>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="15"></Setter>
+            <Setter Property="MinWidth" Value="120"></Setter>
+            <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="Margin" Value="3"></Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <StackPanel>
-            <ComboBox/>
-            <Button x:Name="AcceptButton" Content="Accept"></Button>
-            <Button x:Name="CancelButton" Content="Cancel"></Button>
+            <Label Content="{Binding WithdrawalSum, ElementName=SelectorCashDialogWindow}" ContentStringFormat="Sum of withdrawal: {0}"></Label>
+            <Label Content="Which denomination do you prefer?"/>
+
+            <ComboBox x:Name="DenominationsComboBox" SelectedIndex="0"
+                      ItemsSource="{Binding Denominations, ElementName=SelectorCashDialogWindow}" 
+                      SelectedItem="{Binding SelectedDenomination, ElementName=SelectorCashDialogWindow}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="AcceptButton" Content="Accept" Click="AcceptButton_Click" IsDefault="True"></Button>
+                <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" IsCancel="True"></Button>
+            </StackPanel>
+
         </StackPanel>
     </Grid>
 </Window>

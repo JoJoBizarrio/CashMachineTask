@@ -7,7 +7,8 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="400"
-        FontSize="16">
+        FontSize="16"
+        x:Name="CashMachineWindow">
     <Window.Resources>
         <local:SelectorCashDialog x:Key="dialog" />
         <Style TargetType="Button">
@@ -69,7 +70,7 @@
                                 Command="{Binding PickUp}"
                                 CommandParameter="{Binding ElementName=DenomiantionListBox, Path=SelectedItem}"/>
                     </StackPanel>
-                    <ListView x:Name="DenomiantionListBox" 
+                    <ListView x:Name="DenomiantionListView" 
                              ItemsSource="{Binding SupportedDenomination}"
                              SelectedIndex="0" 
                              HorizontalContentAlignment="Center">
@@ -91,12 +92,23 @@
 
             <TabItem Header="Withdrawal">
                 <StackPanel HorizontalAlignment="Center">
+                    <TextBlock x:Name="WithdrawalStatusTextBlock" 
+                               Text="{Binding WithdrawalStatus}"></TextBlock>
+
                     <StackPanel Orientation="Horizontal">
                         <TextBox x:Name="InputTextBox" 
                                  Text="{Binding WithdrawalSum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                        <Button x:Name="WithdrawalButton" Content="Withdrawal" CommandParameter="{Binding ElementName=InputTextBox, Path=Text}" Command="{Binding Withdrawal}" />
+
+                        <Button x:Name="WithdrawalButton" 
+                                Content="Withdrawal"
+                                Click="WithdrawalButton_Click"
+                                Command="{Binding Withdrawal}"
+                                CommandParameter="{Binding PreferDenomination, ElementName=CashMachineWindow}" />
+
                         <Button x:Name="ClearButton" Content="Clear" Command="{Binding Clear}"/>
                     </StackPanel>
+
+                    <Button x:Name="Test" Click="Test_Click"></Button>
 
                 </StackPanel>
             </TabItem>

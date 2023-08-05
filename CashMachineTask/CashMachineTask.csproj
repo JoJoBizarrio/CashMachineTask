@@ -13,8 +13,4 @@
     <PackageReference Include="NLog" Version="5.2.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="VIewModel\" />
-  </ItemGroup>
-
 </Project>

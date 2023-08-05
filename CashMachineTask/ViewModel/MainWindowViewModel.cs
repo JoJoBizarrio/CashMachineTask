@@ -1,11 +1,14 @@
 ﻿using CashMachineTask.Abstract;
 using CashMachineTask.Model;
+using CashMachineTask.VIewModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 
@@ -13,14 +16,14 @@ namespace CashMachineTask
 {
 	internal class MainWindowViewModel : ViewModelBase
 	{
-		public MainWindowViewModel(ICashMachine cashMachine, IWindowService windowService)
+		public MainWindowViewModel(ICashMachine cashMachine, IDialogService windowService)
 		{
 			_tray = new List<ICash>();
 			_cashMachine = cashMachine;
 			_windowService = windowService;
 		}
 
-		private readonly IWindowService _windowService;
+		private readonly IDialogService _windowService;
 
 		private readonly ICashMachine _cashMachine;
 
@@ -34,7 +37,7 @@ namespace CashMachineTask
 		#region Deposit
 		private readonly List<ICash> _tray;
 
-		public List<decimal> SupportedDenomination => _cashMachine.SupportedDenomination.ToList();
+		public decimal[] SupportedDenomination => _cashMachine.SupportedDenomination.ToArray();
 
 		private decimal _trayCashSum;
 		public decimal TrayCashSum
@@ -112,6 +115,13 @@ namespace CashMachineTask
 		#endregion
 
 		#region Withdrawal
+		private string _withdrawalStatus;
+		public string WithdrawalStatus
+		{
+			get => _withdrawalStatus;
+			set => Set(ref _withdrawalStatus, value);
+		}
+
 		private string _withdrawalSum;
 		public string WithdrawalSum
 		{
@@ -126,19 +136,27 @@ namespace CashMachineTask
 		private IRelayCommand<object> _withdrawal;
 		public IRelayCommand<object> Withdrawal => _withdrawal ??= new RelayCommand<object>(obj =>
 		{
-
+			if (obj is decimal preferDenomination && preferDenomination > 0)
+			{
+				WithdrawalStatus = "Succsesfully take: " + WithdrawalSum;
+			}
 		},
+
 		obj =>
 		{
-			if (obj != null && decimal.TryParse((string)obj, out decimal res))
+			if (decimal.TryParse(WithdrawalSum, out decimal res))
 			{
 				return true;
 			}
+
 			return false;
 		});
 
 		private IRelayCommand _clear;
 		public IRelayCommand Clear => _clear ??= new RelayCommand(() => WithdrawalSum = "");
+
+		//private IRelayCommand _showDialog;
+		//	public IRelayCommand ShowDialog => _showDialog ??= new RelayCommand(() => _windowService.ShowDialog<SelectorCashDialogViewModel>(WithdrawalSum));
 		#endregion
 	}
 }

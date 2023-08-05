@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace CashMachineTask.Abstract
 {
-	interface IWindowService
+	interface IDialogService
 	{
-		public void OpenSelectorCashDialog(object viewModel);
+		void ShowDialog<TViewModel>();
+		void ShowDialog<TViewModel>(string obj);
+		void ShowDialog<TViewModel>(params object[] obj);
 	}
 }
