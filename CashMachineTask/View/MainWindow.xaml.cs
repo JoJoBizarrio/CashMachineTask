@@ -27,10 +27,11 @@ namespace CashMachineTask.View
 			set => SetValue(PreferDenominationProperty, value);
 		}
 
-		public static readonly DependencyProperty PreferDenominationProperty = DependencyProperty.Register(nameof(PreferDenomination),
-																								typeof(decimal),
-																								typeof(MainWindow),
-																								new PropertyMetadata(default(decimal)));
+		public static readonly DependencyProperty PreferDenominationProperty =
+			DependencyProperty.Register(nameof(PreferDenomination),
+				typeof(decimal),
+				typeof(MainWindow),
+				new PropertyMetadata(default(decimal)));
 
 		public MainWindow()
 		{
@@ -62,7 +63,6 @@ namespace CashMachineTask.View
 			{
 				PreferDenomination = 0;
 			}
-
 		}
 	}
 }

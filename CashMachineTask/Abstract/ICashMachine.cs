@@ -2,14 +2,19 @@
 
 namespace CashMachineTask.Abstract
 {
-    internal interface ICashMachine
-    {
-        decimal Balance { get; }
+	internal interface ICashMachine
+	{
+		decimal Balance { get; }
 
-        public IEnumerable<decimal> SupportedDenomination { get; }
+		string Status { get; }
 
-        bool Deposite(IEnumerable<ICash> cash);
+		public IEnumerable<decimal> SupportedDenomination { get; }
 
-        IEnumerable<ICash> Withdrawal(int totalSum);
-    }
+
+		bool TryWithdrawalWithAnyDenomination(decimal totalSum, out List<ICash> cashes);
+		bool TryWithdrawalWithPreferDenomination(decimal totalSum, decimal preferDenomination, out List<ICash> cashes);
+
+		bool TryDeposit(IEnumerable<ICash> cash);
+		bool CanDeposit(IEnumerable<ICash> cash);
+	}
 }

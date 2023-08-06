@@ -1,75 +1,50 @@
 ﻿using CashMachineTask.Abstract;
 using CashMachineTask.Model;
-using CashMachineTask.VIewModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
 
-namespace CashMachineTask
+namespace CashMachineTask.ViewModel
 {
 	internal class MainWindowViewModel : ViewModelBase
 	{
-		public MainWindowViewModel(ICashMachine cashMachine, IDialogService windowService)
+		public MainWindowViewModel(ICashMachine cashMachine)
 		{
 			_tray = new List<ICash>();
 			_cashMachine = cashMachine;
-			_windowService = windowService;
 		}
-
-		private readonly IDialogService _windowService;
 
 		private readonly ICashMachine _cashMachine;
 
-		private string _info;
-		public string Info
-		{
-			get => _cashMachine.ToString();
-			//set => SetProperty(ref _info, );
-		}
+		public string Info => _cashMachine.ToString();
+
+		public string Status => _cashMachine.Status;
 
 		#region Deposit
 		private readonly List<ICash> _tray;
 
+		public decimal TrayCashSum => _tray.Sum(cash => cash.Denomination);
+
 		public decimal[] SupportedDenomination => _cashMachine.SupportedDenomination.ToArray();
 
-		private decimal _trayCashSum;
-		public decimal TrayCashSum
-		{
-			get => _tray.Sum(cash => cash.Denomination);
-			set { }
-		}
 
-		private IRelayCommand _deposit;
-		public IRelayCommand<object> Deposit
+		private IRelayCommand<object> _deposit;
+		public IRelayCommand<object> Deposit => _deposit ??= new RelayCommand<object>(obj =>
 		{
-			get
+			if (TrayCashSum > 0 && _cashMachine.TryDeposit(_tray))
 			{
-				return (IRelayCommand<object>)(_deposit ??= new RelayCommand<object>(obj => // wtf? (IRelayCommand<decimal>) why?
-				{
-					_cashMachine.Deposite(_tray);
-					_tray.Clear();
-					RaiseCanExecuteChanged();
-				},
-
-				obj =>
-				{
-					return true;
-				}));
+				_tray.Clear();
 			}
-		}
+
+			Notify();
+		},
+			obj => TrayCashSum > 0);
 
 		private IRelayCommand _pullAll;
 		public IRelayCommand PullAll => _pullAll ??= new RelayCommand(() =>
 		{
 			_tray.Clear();
-			RaiseCanExecuteChanged();
+			Notify();
 		});
 
 		private IRelayCommand<object> _lower;
@@ -77,8 +52,8 @@ namespace CashMachineTask
 		{
 			if (obj != null && obj is decimal denomination)
 			{
-				_tray.Add(new Cash(null, denomination));
-				RaiseCanExecuteChanged();
+				_tray.Add(new Cash(denomination));
+				Notify();
 			}
 		});
 
@@ -88,7 +63,7 @@ namespace CashMachineTask
 			if (obj != null && obj is decimal denomination)
 			{
 				_tray.Remove(_tray.First(cash => cash.Denomination == denomination));
-				RaiseCanExecuteChanged();
+				Notify();
 			}
 		},
 
@@ -104,31 +79,27 @@ namespace CashMachineTask
 
 		public IRelayCommand<object> _onSelectionChangedRaiseCanExecute;
 		public IRelayCommand<object> OnSelectionChangedRaiseCanExecute =>
-			_onSelectionChangedRaiseCanExecute ??= new RelayCommand<object>(obj => { RaiseCanExecuteChanged(); });
+			_onSelectionChangedRaiseCanExecute ??= new RelayCommand<object>(obj => { Notify(); });
 
-		public void RaiseCanExecuteChanged()
+		public void Notify()
 		{
 			PickUp.NotifyCanExecuteChanged();
+			Deposit.NotifyCanExecuteChanged();
+			OnPropertyChanged(nameof(Status));
 			OnPropertyChanged(nameof(TrayCashSum));
 			OnPropertyChanged(nameof(Info));
 		}
 		#endregion
 
 		#region Withdrawal
-		private string _withdrawalStatus;
-		public string WithdrawalStatus
+		private decimal _withdrawalSum;
+		private string _withdrawalSumString;
+		public string WithdrawalSumString
 		{
-			get => _withdrawalStatus;
-			set => Set(ref _withdrawalStatus, value);
-		}
-
-		private string _withdrawalSum;
-		public string WithdrawalSum
-		{
-			get => _withdrawalSum;
+			get => _withdrawalSumString;
 			set
 			{
-				Set(ref _withdrawalSum, value);
+				Set(ref _withdrawalSumString, value);
 				Withdrawal.NotifyCanExecuteChanged();
 			}
 		}
@@ -138,14 +109,21 @@ namespace CashMachineTask
 		{
 			if (obj is decimal preferDenomination && preferDenomination > 0)
 			{
-				WithdrawalStatus = "Succsesfully take: " + WithdrawalSum;
+				var list = new List<ICash>();
+
+				if (_cashMachine.TryWithdrawalWithPreferDenomination(_withdrawalSum, preferDenomination, out list))
+				{
+				}
+
+				Notify();
 			}
 		},
 
 		obj =>
 		{
-			if (decimal.TryParse(WithdrawalSum, out decimal res))
+			if (decimal.TryParse(WithdrawalSumString, out decimal res))
 			{
+				_withdrawalSum = res;
 				return true;
 			}
 
@@ -153,10 +131,7 @@ namespace CashMachineTask
 		});
 
 		private IRelayCommand _clear;
-		public IRelayCommand Clear => _clear ??= new RelayCommand(() => WithdrawalSum = "");
-
-		//private IRelayCommand _showDialog;
-		//	public IRelayCommand ShowDialog => _showDialog ??= new RelayCommand(() => _windowService.ShowDialog<SelectorCashDialogViewModel>(WithdrawalSum));
+		public IRelayCommand Clear => _clear ??= new RelayCommand(() => WithdrawalSumString = "");
 		#endregion
 	}
 }

@@ -1,7 +1,6 @@
-﻿using CashMachineTask.Abstract;
-using CashMachineTask.Model;
+﻿using CashMachineTask.Model;
 using CashMachineTask.View;
-using CashMachineTask.VIewModel;
+using CashMachineTask.ViewModel;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -15,22 +14,20 @@ namespace CashMachineTask
 	/// </summary>
 	public partial class App : Application
 	{
-		private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+		// logger dosnt work. why?
+		private static Logger _logger = LogManager.GetCurrentClassLogger();
 
 		protected override void OnStartup(StartupEventArgs e)
 		{
-			MainWindow mainWindow = new MainWindow();
-			var cassettesList = new List<Cassette>() { new Cassette(null, 100, 20), new Cassette(null, 500, 30), new Cassette(null, 1000, 20) };
-			var cashMachine = new CashMachine(cassettesList);
-			var dialogService = new DialogService();
-
-			DialogService.RegisterDialog<SelectorCashDialogViewModel, SelectorCashDialog>();
-
-			mainWindow.DataContext = new MainWindowViewModel(cashMachine, dialogService);
-
-			mainWindow.Show();
-
 			SetupExceptionHandling();
+
+			MainWindow mainWindow = new MainWindow();
+
+			var cassettesList = new List<Cassette>() { new Cassette(100, 2, 200), new Cassette(500, 5, 3000) };
+			var cashMachine = new CashMachine(cassettesList);
+
+			mainWindow.DataContext = new MainWindowViewModel(cashMachine);
+			mainWindow.Show();
 		}
 
 		private void SetupExceptionHandling()
@@ -54,6 +51,7 @@ namespace CashMachineTask
 		private void LogUnhandledException(Exception exception, string source)
 		{
 			string message = $"Unhandled exception ({source})";
+
 			try
 			{
 				System.Reflection.AssemblyName assemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName();

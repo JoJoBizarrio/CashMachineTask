@@ -1,70 +1,105 @@
 ﻿using CashMachineTask.Abstract;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace CashMachineTask.Model
 {
 	internal class Cassette : ICassette
 	{
-		public ICurrency StoredCurrency { get; }
 		public decimal StoredDenomination { get; }
 
-		public int Quantity { get; private set; }
-		public int Capacity { get; }
+		public int Quantity => _storege.Count;
+		public int Capacity => _storege.Capacity;
 		public bool IsFull => Quantity == Capacity;
 		public decimal Balance => Quantity * StoredDenomination;
 
 		private List<ICash> _storege { get; set; }
 
-		public Cassette(ICurrency currency, decimal denomination, int capacity)
+		public Cassette(decimal denomination, int quantity, int capacity)
 		{
-			Capacity = capacity;
-			StoredCurrency = currency;
-			StoredDenomination = denomination;
+			if (quantity > capacity)
+			{
+				throw new ArgumentException("Cashes quantity is more than capacity of cassette.", nameof(quantity));
+			}
+
 			_storege = new List<ICash>(capacity);
-		}
 
-		public bool TryAdd(ICash[] values)
-		{
-			var count = values.Length;
-
-			if (Quantity + count <= Capacity)
+			for (int i = 0; i < quantity; i++)
 			{
-				foreach (Cash value in values)
-				{
-					_storege.Add(value);
-				}
-
-				Quantity += count;
-				return true;
+				_storege.Add(new Cash(denomination));
 			}
 
-			return false;
+			StoredDenomination = denomination;
 		}
 
-		public bool TryPull(int count, out ICash[] values)
+		public Cassette(IEnumerable<ICash> cashes, decimal denomination, int capacity)
 		{
-			if (Quantity - count >= 0)
+			if (cashes.Count() > capacity)
 			{
-				values = new Cash[count];
-
-				for (int i = 0; i < count; i++)
-				{
-					values[i] = _storege[i];
-				}
-
-				_storege.RemoveRange(0, count);
-				Quantity -= count;
-				return true;
+				throw new ArgumentException("Inserted cashes count is more than capacity of cassette.", nameof(cashes));
 			}
 
-			values = Array.Empty<ICash>();
-			return false;
+			if (cashes.Any(cash => cash.Denomination != denomination))
+			{
+				throw new ArgumentException("Cashes denomination is difference by specified.", nameof(denomination));
+			}
+
+			_storege = (List<ICash>)cashes;
+			StoredDenomination = denomination;
 		}
 
-		public string GetInfo()
+		public override string ToString()
 		{
-			throw new NotImplementedException();
+			StringBuilder stringBuilder = new StringBuilder();
+
+			stringBuilder.Append("Stored denomination: ");
+			stringBuilder.Append(StoredDenomination);
+			stringBuilder.Append("; ");
+
+			stringBuilder.Append("Occupancy: ");
+			stringBuilder.Append($"{Quantity} of {Capacity};");
+
+			return stringBuilder.ToString();
+		}
+
+		public bool CanDeposit(IEnumerable<ICash> cashes)
+		{
+			if (cashes.Any(cash => cash.Denomination != StoredDenomination))
+			{
+				return false;
+			}
+
+			if (Quantity + cashes.Count() > Capacity)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		public void Deposite(IEnumerable<ICash> cashes)
+		{
+			if (!CanDeposit(cashes))
+			{
+				throw new InvalidOperationException("Cashes is wrong.");
+			}
+
+			_storege.AddRange(cashes);
+		}
+
+		public IEnumerable<ICash> Withdrawal(int cashesCount)
+		{
+			var list = new List<ICash>(cashesCount);
+
+			for (int i = 0; i < cashesCount; i++)
+			{
+				list.Add(_storege[i]);
+			}
+
+			_storege.RemoveRange(0, cashesCount);
+			return list;
 		}
 	}
 }

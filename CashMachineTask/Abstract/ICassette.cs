@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace CashMachineTask.Abstract
 {
@@ -8,11 +9,11 @@ namespace CashMachineTask.Abstract
 		int Capacity { get; }
 		bool IsFull { get; }
 		decimal Balance { get; }
-
-		ICurrency StoredCurrency { get; }
 		decimal StoredDenomination { get; }
 
-		bool TryAdd(ICash[] values);
-		bool TryPull(int count, out ICash[] values);
+		bool CanDeposit(IEnumerable<ICash> cashes);
+		void Deposite(IEnumerable<ICash> cashes);
+
+		IEnumerable<ICash> Withdrawal(int cashesCount);
 	}
 }

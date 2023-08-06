@@ -7,8 +7,6 @@ namespace CashMachineTask.Abstract
     {
         public Guid SerialNumber { get; }
 
-        public ICurrency Currency { get; }
-
         public decimal Denomination { get; }
     }
 }

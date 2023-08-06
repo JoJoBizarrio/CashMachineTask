@@ -9,15 +9,15 @@
         Title="MainWindow" Height="450" Width="400"
         FontSize="16"
         x:Name="CashMachineWindow">
+
     <Window.Resources>
-        <local:SelectorCashDialog x:Key="dialog" />
         <Style TargetType="Button">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="Margin" Value="3,3,3,3"/>
-            <Setter Property="Height" Value="24"/>
+            <Setter Property="MinHeight" Value="24"/>
             <Setter Property="MinWidth" Value="120"/>
         </Style>
         <Style TargetType="TextBox">
@@ -34,46 +34,53 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="10*"/>
             <RowDefinition Height="50*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock x:Name="InfoBlock" Text="{Binding Info}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <TextBlock x:Name="InfoBlock" Margin="5" Text="{Binding Info}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
-        <TabControl  Grid.Row="1">
-            <TabItem Header="Depositing">
+        <TextBlock x:Name="StatusTextBlock" Margin="5" Grid.Row="1" Text="{Binding Status}"></TextBlock>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="2">
+            <Label Content="Tray:"></Label>
+            <TextBox x:Name="TrayCashSumTextBox" 
+                     Text="{Binding TrayCashSum, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Width="150"></TextBox>
+        </StackPanel>
+
+        <TabControl x:Name="ActionsTabControl"  Grid.Row="3" Margin="3">
+
+            <TabItem x:Name="DepositTabItem" Header="Depositing">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox x:Name="TrayCashSumTextBox" 
-                                 Text="{Binding TrayCashSum, Mode=OneWay}"
-                                 IsReadOnly="True"
-                                 Height="23">
-
-                        </TextBox>
-                        <Button x:Name="DepositButton" Content="Deposit" Command="{Binding Deposit}"/>
-                        <Button x:Name="PullAllButton" Content="Pull all" Command="{Binding PullAll}"/>
+                        <Button x:Name="DepositButton" Content="Deposit" Command="{Binding Deposit}" />
+                        <Button x:Name="PullAllButton" Content="Pull all" Command="{Binding PullAll}" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal">
                         <Button x:Name="LowerButton" 
-                                Width="140" 
                                 ContentStringFormat="Lower: {0}"
-                                Content="{Binding ElementName=DenomiantionListBox, Path=SelectedItem}" 
+                                Content="{Binding ElementName=DenomiantionListView, Path=SelectedItem}" 
                                 Command="{Binding Lower}"
-                                CommandParameter="{Binding ElementName=DenomiantionListBox, Path=SelectedItem}">
-                        </Button>
+                                CommandParameter="{Binding ElementName=DenomiantionListView, Path=SelectedItem}"></Button>
 
                         <Button x:Name="PickUpButton" 
-                                Width="140"
                                 ContentStringFormat="Pick up: {0}"
-                                Content="{Binding ElementName=DenomiantionListBox, Path=SelectedItem}" 
+                                HorizontalContentAlignment="Center"
+                                Content="{Binding ElementName=DenomiantionListView, Path=SelectedItem}" 
                                 Command="{Binding PickUp}"
-                                CommandParameter="{Binding ElementName=DenomiantionListBox, Path=SelectedItem}"/>
+                                CommandParameter="{Binding ElementName=DenomiantionListView, Path=SelectedItem}"/>
                     </StackPanel>
+
                     <ListView x:Name="DenomiantionListView" 
-                             ItemsSource="{Binding SupportedDenomination}"
-                             SelectedIndex="0" 
-                             HorizontalContentAlignment="Center">
+                              Margin="10"
+                              ItemsSource="{Binding SupportedDenomination}"
+                              SelectedIndex="0" 
+                              HorizontalContentAlignment="Center">
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="SelectionChanged">
@@ -90,14 +97,12 @@
                 </StackPanel>
             </TabItem>
 
-            <TabItem Header="Withdrawal">
+            <TabItem x:Name="WithdrawalTabItem" Header="Withdrawal">
                 <StackPanel HorizontalAlignment="Center">
-                    <TextBlock x:Name="WithdrawalStatusTextBlock" 
-                               Text="{Binding WithdrawalStatus}"></TextBlock>
 
                     <StackPanel Orientation="Horizontal">
                         <TextBox x:Name="InputTextBox" 
-                                 Text="{Binding WithdrawalSum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                 Text="{Binding WithdrawalSumString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
 
                         <Button x:Name="WithdrawalButton" 
                                 Content="Withdrawal"
@@ -107,12 +112,8 @@
 
                         <Button x:Name="ClearButton" Content="Clear" Command="{Binding Clear}"/>
                     </StackPanel>
-
-                    <Button x:Name="Test" Click="Test_Click"></Button>
-
                 </StackPanel>
             </TabItem>
         </TabControl>
-
     </Grid>
 </Window>

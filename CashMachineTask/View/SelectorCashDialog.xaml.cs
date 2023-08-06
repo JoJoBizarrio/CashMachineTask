@@ -25,10 +25,11 @@ namespace CashMachineTask.View
 			set => SetValue(DenominationsProperty, value);
 		}
 
-		public static readonly DependencyProperty DenominationsProperty = DependencyProperty.Register(nameof(Denominations),
-																									  typeof(decimal[]),
-																									  typeof(SelectorCashDialog),
-																									  new PropertyMetadata(default(decimal[])));
+		public static readonly DependencyProperty DenominationsProperty =
+			DependencyProperty.Register(nameof(Denominations),
+				typeof(decimal[]),
+				typeof(SelectorCashDialog),
+				new PropertyMetadata(default(decimal[])));
 
 		public decimal WithdrawalSum
 		{
@@ -36,10 +37,11 @@ namespace CashMachineTask.View
 			set => SetValue(WithdrawalSumProperty, value);
 		}
 
-		public static readonly DependencyProperty WithdrawalSumProperty = DependencyProperty.Register(nameof(WithdrawalSum),
-																									  typeof(decimal),
-																									  typeof(SelectorCashDialog),
-																									  new PropertyMetadata(default(decimal)));
+		public static readonly DependencyProperty WithdrawalSumProperty =
+			DependencyProperty.Register(nameof(WithdrawalSum),
+				typeof(decimal),
+				typeof(SelectorCashDialog),
+				new PropertyMetadata(default(decimal)));
 
 		public decimal SelectedDenomination
 		{
@@ -47,10 +49,11 @@ namespace CashMachineTask.View
 			set => SetValue(SelectedDenominationProperty, value);
 		}
 
-		private static readonly DependencyProperty SelectedDenominationProperty = DependencyProperty.Register(nameof(SelectedDenominationProperty),
-																									   typeof(decimal),
-																									   typeof(MainWindow),
-																									   new PropertyMetadata(default(decimal)));
+		private static readonly DependencyProperty SelectedDenominationProperty =
+			DependencyProperty.Register(nameof(SelectedDenominationProperty),
+				typeof(decimal),
+				typeof(MainWindow),
+				new PropertyMetadata(default(decimal)));
 
 		public SelectorCashDialog()
 		{
