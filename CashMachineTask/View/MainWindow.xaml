@@ -64,19 +64,19 @@
                     <StackPanel Orientation="Horizontal">
                         <Button x:Name="LowerButton" 
                                 ContentStringFormat="Lower: {0}"
-                                Content="{Binding ElementName=DenomiantionListView, Path=SelectedItem}" 
+                                Content="{Binding ElementName=DenominationListView, Path=SelectedItem}" 
                                 Command="{Binding Lower}"
-                                CommandParameter="{Binding ElementName=DenomiantionListView, Path=SelectedItem}"></Button>
+                                CommandParameter="{Binding ElementName=DenominationListView, Path=SelectedItem}"></Button>
 
                         <Button x:Name="PickUpButton" 
                                 ContentStringFormat="Pick up: {0}"
                                 HorizontalContentAlignment="Center"
-                                Content="{Binding ElementName=DenomiantionListView, Path=SelectedItem}" 
+                                Content="{Binding ElementName=DenominationListView, Path=SelectedItem}" 
                                 Command="{Binding PickUp}"
-                                CommandParameter="{Binding ElementName=DenomiantionListView, Path=SelectedItem}"/>
+                                CommandParameter="{Binding ElementName=DenominationListView, Path=SelectedItem}"/>
                     </StackPanel>
 
-                    <ListView x:Name="DenomiantionListView" 
+                    <ListView x:Name="DenominationListView" 
                               Margin="10"
                               ItemsSource="{Binding SupportedDenomination}"
                               SelectedIndex="0" 

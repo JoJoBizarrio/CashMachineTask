@@ -38,26 +38,20 @@ namespace CashMachineTask.View
 			InitializeComponent();
 		}
 
-		private void Test_Click(object sender, RoutedEventArgs e)
-		{
-
-
-
-		}
-
 		private void WithdrawalButton_Click(object sender, RoutedEventArgs e)
 		{
-			var selector = new SelectorCashDialog();
-			selector.Owner = this;
-			var dec = decimal.Parse(InputTextBox.Text);
-			var denom = DenomiantionListView.ItemsSource;
+			var selectorDialog = new SelectorCashDialog() { Denominations = (decimal[])DenominationListView.ItemsSource };
 
-			selector.WithdrawalSum = dec;
-			selector.Denominations = (decimal[])denom;
+			selectorDialog.Owner = this;
 
-			if (selector.ShowDialog() == true)
+			if (decimal.TryParse(InputTextBox.Text, out decimal result))
 			{
-				PreferDenomination = selector.SelectedDenomination;
+				selectorDialog.WithdrawalSum = result;
+			}
+
+			if (selectorDialog.ShowDialog() == true)
+			{
+				PreferDenomination = selectorDialog.SelectedDenomination;
 			}
 			else
 			{
