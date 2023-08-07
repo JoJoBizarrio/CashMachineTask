@@ -26,7 +26,10 @@ namespace CashMachineTask
 			var cassettesList = new List<Cassette>() { new Cassette(100, 2, 200), new Cassette(500, 5, 3000) };
 			var cashMachine = new CashMachine(cassettesList);
 
-			mainWindow.DataContext = new MainWindowViewModel(cashMachine);
+			var dialogService = new DialogService();
+            DialogService.RegisterDialog<SelectorCashDialogViewModel, SelectorCashModalDialog>();
+            
+			mainWindow.DataContext = new MainWindowViewModel(cashMachine, dialogService);
 			mainWindow.Show();
 		}
 
