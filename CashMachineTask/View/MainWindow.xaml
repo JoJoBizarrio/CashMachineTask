@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CashMachineTask.View"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="400"
+        Title="MainWindow" Height="460" Width="410"
         FontSize="16"
         x:Name="CashMachineWindow">
 
@@ -32,7 +32,7 @@
         </Style>
     </Window.Resources>
 
-    <Grid>
+    <Grid Margin="3">
         <Grid.RowDefinitions>
             <RowDefinition Height="30*"/>
             <RowDefinition Height="10*"/>
@@ -78,7 +78,7 @@
 
                     <ListView x:Name="DenominationListView" 
                               Margin="10"
-                              ItemsSource="{Binding SupportedDenomination}"
+                              ItemsSource="{Binding SupportedDenominations}"
                               SelectedIndex="0" 
                               HorizontalContentAlignment="Center">
 
@@ -106,9 +106,8 @@
 
                         <Button x:Name="WithdrawalButton" 
                                 Content="Withdrawal"
-                                Click="WithdrawalButton_Click"
                                 Command="{Binding Withdrawal}"
-                                CommandParameter="{Binding PreferDenomination, ElementName=CashMachineWindow}" />
+                                CommandParameter="{Binding ElementName=CashMachineWindow}" />
 
                         <Button x:Name="ClearButton" Content="Clear" Command="{Binding Clear}"/>
                     </StackPanel>

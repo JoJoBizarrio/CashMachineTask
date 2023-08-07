@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace CashMachineTask.Abstract
 {
-    interface IDialogService
+    internal interface IDialogViewModel
     {
-        void ShowDialog<TVIewModel>(IDialogParametrs dialogParametrs, Action<bool?, object> callback);
+        void OnDialogOpened(IDialogParametrs parametrs);
+
+        object Result { get; }
     }
 }

@@ -8,7 +8,7 @@ namespace CashMachineTask.Abstract
 
 		string Status { get; }
 
-		public IEnumerable<decimal> SupportedDenomination { get; }
+		public IEnumerable<decimal> SupportedDenominations { get; }
 
 
 		bool TryWithdrawalWithAnyDenomination(decimal totalSum, out List<ICash> cashes);

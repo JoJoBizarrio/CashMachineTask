@@ -21,42 +21,9 @@ namespace CashMachineTask.View
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		public decimal PreferDenomination
-		{
-			get => (decimal)GetValue(PreferDenominationProperty);
-			set => SetValue(PreferDenominationProperty, value);
-		}
-
-		public static readonly DependencyProperty PreferDenominationProperty =
-			DependencyProperty.Register(nameof(PreferDenomination),
-				typeof(decimal),
-				typeof(MainWindow),
-				new PropertyMetadata(default(decimal)));
-
 		public MainWindow()
 		{
 			InitializeComponent();
-		}
-
-		private void WithdrawalButton_Click(object sender, RoutedEventArgs e)
-		{
-			var selectorDialog = new SelectorCashDialog() { Denominations = (decimal[])DenominationListView.ItemsSource };
-
-			selectorDialog.Owner = this;
-
-			if (decimal.TryParse(InputTextBox.Text, out decimal result))
-			{
-				selectorDialog.WithdrawalSum = result;
-			}
-
-			if (selectorDialog.ShowDialog() == true)
-			{
-				PreferDenomination = selectorDialog.SelectedDenomination;
-			}
-			else
-			{
-				PreferDenomination = 0;
-			}
 		}
 	}
 }
