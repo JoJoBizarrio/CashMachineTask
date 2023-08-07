@@ -12,9 +12,6 @@ namespace CashMachineTask.Model
 
 		public IEnumerable<decimal> SupportedDenominations => _cassettes.Select(item => item.StoredDenomination).OrderBy(x => x).ToHashSet().ToArray();
 
-		public string Status { get; private set; }
-
-
 		private readonly List<ICassette> _cassettes;
 
 		public CashMachine(IEnumerable<ICassette> cassettes)
@@ -34,7 +31,6 @@ namespace CashMachineTask.Model
 
 			if (!CanDeposit(cashGroupByDenomination))
 			{
-				Status = "Cant deposit. Try again or later";
 				return false;
 			};
 
@@ -43,7 +39,6 @@ namespace CashMachineTask.Model
 				_cassettes.First(item => item.StoredDenomination == cashGroupByDenomination[i].Key).Deposite(cashGroupByDenomination[i]);
 			}
 
-			Status = "Done. Cashes deposited on your balance";
 			return true;
 		}
 
@@ -74,12 +69,12 @@ namespace CashMachineTask.Model
 		#endregion
 
 		#region withdrawal
-		public bool TryWithdrawalWithAnyDenomination(decimal totalSum, out List<ICash> cashes)
+		public bool TryWithdrawal(decimal totalSum, out List<ICash> cashes)
 		{
 			return TryWithdrawal(totalSum, SupportedDenominations.ToArray(), out cashes);
 		}
 
-		public bool TryWithdrawalWithPreferDenomination(decimal totalSum, decimal preferDenomination, out List<ICash> cashes)
+		public bool TryWithdrawal(decimal totalSum, decimal preferDenomination, out List<ICash> cashes)
 		{
 			cashes = new List<ICash>();
 
@@ -88,17 +83,16 @@ namespace CashMachineTask.Model
 			return TryWithdrawal(totalSum, denomination, out cashes);
 		}
 
-		private bool TryWithdrawal(decimal totalSum, decimal[] preferDenomination, out List<ICash> cashes)
+		private bool TryWithdrawal(decimal totalSum, decimal[] denomination, out List<ICash> cashes)
 		{
 			cashes = new List<ICash>();
 
 			if (totalSum > Balance)
 			{
-				Status = "Something went wrong. Try again or later.";
 				return false;
 			}
 
-			var length = preferDenomination.Length;
+			var length = denomination.Length;
 			var cashCount = 0;
 			var current = totalSum;
 			var denominationKeyCountValueDictionary = new Dictionary<decimal, int>();
@@ -106,17 +100,16 @@ namespace CashMachineTask.Model
 			for (int i = 0; i < length; i++)
 			{
 				cashCount = 0;
-				cashCount = (int)(current / preferDenomination[i]);
-				current -= preferDenomination[i] * cashCount;
+				cashCount = (int)(current / denomination[i]);
+				current -= denomination[i] * cashCount;
 
-				if (_cassettes.First(item => item.StoredDenomination == preferDenomination[i]).Quantity >= cashCount)
+				if (_cassettes.First(item => item.StoredDenomination == denomination[i]).Quantity >= cashCount)
 				{
-					denominationKeyCountValueDictionary.Add(preferDenomination[i], cashCount);
+					denominationKeyCountValueDictionary.Add(denomination[i], cashCount);
 				}
 				else
 				{
 					cashes = null;
-					Status = "Cant do now. Try again or later";
 					return false;
 				}
 			}
@@ -124,7 +117,6 @@ namespace CashMachineTask.Model
 			foreach (var key in denominationKeyCountValueDictionary)
 			{
 				cashes.AddRange(_cassettes.First(item => item.StoredDenomination == key.Key).Withdrawal(key.Value));
-				Status = "Take your money";
 			}
 
 			return true;
