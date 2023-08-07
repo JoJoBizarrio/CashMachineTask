@@ -23,7 +23,8 @@ namespace CashMachineTask.ViewModel
 
         public string Info => _cashMachine.ToString();
 
-        public string Status => _cashMachine.Status;
+        private string _status;
+        public string Status { get => _status; set => Set(ref _status, value); }
 
         #region Deposit
         private readonly List<ICash> _tray;
@@ -31,7 +32,6 @@ namespace CashMachineTask.ViewModel
         public decimal TrayCashSum => _tray.Sum(cash => cash.Denomination);
 
         public decimal[] SupportedDenominations => _cashMachine.SupportedDenominations.ToArray();
-
 
         private IRelayCommand<object> _deposit;
         public IRelayCommand<object> Deposit => _deposit ??= new RelayCommand<object>(obj =>
@@ -90,7 +90,7 @@ namespace CashMachineTask.ViewModel
         {
             PickUp.NotifyCanExecuteChanged();
             Deposit.NotifyCanExecuteChanged();
-            OnPropertyChanged(nameof(Status));
+            Status = _cashMachine.Status;
             OnPropertyChanged(nameof(TrayCashSum));
             OnPropertyChanged(nameof(Info));
         }
@@ -119,15 +119,23 @@ namespace CashMachineTask.ViewModel
 
             var list = new List<ICash>();
 
-            _dialogService.ShowDialog<SelectorCashDialogViewModel>(dialogParametrs, (dialogResult, result) =>
+            if (_tray.Count == 0)
             {
-                if (dialogResult == true && result is decimal preferDenomination)
+                _dialogService.ShowDialog<SelectorCashDialogViewModel>(dialogParametrs, (dialogResult, result) =>
                 {
-                    _cashMachine.TryWithdrawalWithPreferDenomination(_withdrawalSum, preferDenomination, out list);
-                }
+                    if (dialogResult == true && result is decimal preferDenomination &&
+                    _cashMachine.TryWithdrawalWithPreferDenomination(_withdrawalSum, preferDenomination, out list))
+                    {
+                        _tray.AddRange(list);
+                    }
+                });
 
                 Notify();
-            });
+            }
+            else
+            {
+                Status = "Take money from tray before withdrawal.";
+            }
         },
 
         obj =>
