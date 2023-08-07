@@ -99,11 +99,11 @@
 
             <TabItem x:Name="WithdrawalTabItem" Header="Withdrawal">
                 <StackPanel HorizontalAlignment="Center">
-
+                    <TextBox x:Name="InputTextBox" 
+                             HorizontalAlignment="Stretch"
+                             Text="{Binding WithdrawalSumString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox x:Name="InputTextBox" 
-                                 Text="{Binding WithdrawalSumString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-
+                        
                         <Button x:Name="WithdrawalButton" 
                                 Content="Withdrawal"
                                 Command="{Binding Withdrawal}"

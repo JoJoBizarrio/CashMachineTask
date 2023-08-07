@@ -1,9 +1,7 @@
 ﻿using CashMachineTask.Abstract;
-using NLog.Filters;
 using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace CashMachineTask.Model
 {

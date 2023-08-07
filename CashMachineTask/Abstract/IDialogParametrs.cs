@@ -1,7 +1,4 @@
-﻿using System;
-using System.Dynamic;
-
-namespace CashMachineTask.Abstract
+﻿namespace CashMachineTask.Abstract
 {
     public interface IDialogParametrs
     {

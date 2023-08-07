@@ -13,7 +13,8 @@ namespace CashMachineTask.ViewModel
     {
         public decimal[] SupportedDenominations { get; set; }
 
-        public decimal PreferDenomination { get; set; }
+        private decimal _preferDenomination;
+        public decimal PreferDenomination { get => _preferDenomination; set => Set(ref _preferDenomination, value); }
 
         public string WithdrawalSumString { get; set; }
 
@@ -23,6 +24,7 @@ namespace CashMachineTask.ViewModel
         {
             SupportedDenominations = parametrs.GetValue<decimal[]>(nameof(SupportedDenominations)); // how cut nameof??
             WithdrawalSumString = parametrs.GetValue<string>(nameof(WithdrawalSumString));
+            PreferDenomination = SupportedDenominations.Min();
         }
     }
 }

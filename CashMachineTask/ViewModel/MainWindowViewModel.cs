@@ -11,33 +11,15 @@ namespace CashMachineTask.ViewModel
 {
     internal class MainWindowViewModel : ViewModelBase
     {
-        public MainWindowViewModel(ICashMachine cashMachine)
+        public MainWindowViewModel(ICashMachine cashMachine, IDialogService dialogService)
         {
             _tray = new List<ICash>();
             _cashMachine = cashMachine;
-            _dialogService = new DialogService();
-            DialogService.RegisterDialog<SelectorCashDialogViewModel, SelectorCashModalDialog>();
+            _dialogService = dialogService;
         }
 
         private readonly ICashMachine _cashMachine;
         private readonly IDialogService _dialogService;
-
-        private IRelayCommand<object> _show;
-        public IRelayCommand<object> Show => _show ??= new RelayCommand<object>(obj =>
-        {
-            DialogParametrs dialogParametrs = new DialogParametrs();
-            dialogParametrs.Register(nameof(WithdrawalSumString), WithdrawalSumString);
-            dialogParametrs.Register(nameof(SupportedDenominations), SupportedDenominations);
-            dialogParametrs.Register(nameof(obj), obj, obj.GetType());
-
-            _dialogService.ShowDialog<SelectorCashDialogViewModel>(dialogParametrs, (dialogResult, result) =>
-            {
-                if (dialogResult == true)
-                {
-
-                }
-            });
-        });
 
         public string Info => _cashMachine.ToString();
 
@@ -139,7 +121,7 @@ namespace CashMachineTask.ViewModel
 
             _dialogService.ShowDialog<SelectorCashDialogViewModel>(dialogParametrs, (dialogResult, result) =>
             {
-                if (dialogResult == true && obj is decimal preferDenomination)
+                if (dialogResult == true && result is decimal preferDenomination)
                 {
                     _cashMachine.TryWithdrawalWithPreferDenomination(_withdrawalSum, preferDenomination, out list);
                 }
@@ -150,7 +132,7 @@ namespace CashMachineTask.ViewModel
 
         obj =>
         {
-            if (decimal.TryParse(WithdrawalSumString, out decimal res) && res > SupportedDenominations.Min())
+            if (decimal.TryParse(WithdrawalSumString, out decimal res) && res >= SupportedDenominations.Min())
             {
                 _withdrawalSum = res;
                 return true;
