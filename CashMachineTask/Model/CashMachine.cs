@@ -10,7 +10,7 @@ namespace CashMachineTask.Model
 	{
 		public decimal Balance => _cassettes.Sum(cassette => cassette.Balance);
 
-		public IEnumerable<decimal> SupportedDenomination => _cassettes.Select(item => item.StoredDenomination).OrderBy(x => x).ToHashSet().ToArray();
+		public IEnumerable<decimal> SupportedDenominations => _cassettes.Select(item => item.StoredDenomination).OrderBy(x => x).ToHashSet().ToArray();
 
 		public string Status { get; private set; }
 
@@ -76,14 +76,14 @@ namespace CashMachineTask.Model
 		#region withdrawal
 		public bool TryWithdrawalWithAnyDenomination(decimal totalSum, out List<ICash> cashes)
 		{
-			return TryWithdrawal(totalSum, SupportedDenomination.ToArray(), out cashes);
+			return TryWithdrawal(totalSum, SupportedDenominations.ToArray(), out cashes);
 		}
 
 		public bool TryWithdrawalWithPreferDenomination(decimal totalSum, decimal preferDenomination, out List<ICash> cashes)
 		{
 			cashes = new List<ICash>();
 
-			var denomination = SupportedDenomination.Where(item => item <= preferDenomination).OrderByDescending(item => item).ToArray();
+			var denomination = SupportedDenominations.Where(item => item <= preferDenomination).OrderByDescending(item => item).ToArray();
 
 			return TryWithdrawal(totalSum, denomination, out cashes);
 		}

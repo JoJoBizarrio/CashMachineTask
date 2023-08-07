@@ -1,5 +1,4 @@
-﻿using CashMachineTask.Model;
-using System;
+﻿using System;
 
 namespace CashMachineTask.Abstract
 {
