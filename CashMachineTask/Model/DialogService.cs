@@ -14,32 +14,7 @@ namespace CashMachineTask.Model
             _mapping.Add(typeof(TViewModel), typeof(TView));
         }
 
-        public void ShowDialog<TViewModel>(IDialogParametrs dialogParametrs, Action<bool?, object> callback)
-        {
-            var viewType = _mapping[typeof(TViewModel)];
-            var item = Activator.CreateInstance(viewType);
-
-            if (item is Window dialog)
-            {
-                var dialogViewModel = (IDialogViewModel)Activator.CreateInstance(typeof(TViewModel));
-                dialog.DataContext = dialogViewModel;
-                dialog.Owner = dialogParametrs.GetValue<Window>("Owner");
-
-                dialogViewModel.OnDialogOpened(dialogParametrs);
-
-                EventHandler onClosed = null;
-                onClosed = (s, e) =>
-                {
-                    callback(dialog.DialogResult, dialogViewModel.Result);
-                    dialog.Closed -= onClosed;
-                };
-
-                dialog.Closed += onClosed;
-                dialog.ShowDialog();
-            }
-        }
-
-        public void ShowDialog(IDialogViewModel viewModel, Action<bool?, object> callback)
+        public void ShowDialog<TResult>(IDialogViewModel viewModel, Action<bool?, TResult> callback)
         {
             var viewType = _mapping[viewModel.GetType()];
             var item = Activator.CreateInstance(viewType);
@@ -47,12 +22,12 @@ namespace CashMachineTask.Model
             if (item is Window dialog)
             {
                 dialog.DataContext = viewModel;
-                dialog.Owner = viewModel.Owner;
+                dialog.Owner = Application.Current.MainWindow;
 
                 EventHandler onClosed = null;
                 onClosed = (s, e) =>
                 {
-                    callback(dialog.DialogResult, viewModel.Result);
+                    callback(dialog.DialogResult, (TResult)viewModel.Result);
                     dialog.Closed -= onClosed;
                 };
 

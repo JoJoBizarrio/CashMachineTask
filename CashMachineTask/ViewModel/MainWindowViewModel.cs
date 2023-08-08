@@ -1,13 +1,8 @@
 ﻿using CashMachineTask.Abstract;
 using CashMachineTask.Model;
-using CashMachineTask.View;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
-
 namespace CashMachineTask.ViewModel
 {
     internal class MainWindowViewModel : ViewModelBase
@@ -27,9 +22,9 @@ namespace CashMachineTask.ViewModel
         private string _status;
         public string Status { get => _status; set => Set(ref _status, value); }
 
-        #region Deposit
         private readonly List<ICash> _tray;
 
+        #region Deposit
         public decimal TrayCashSum => _tray.Sum(cash => cash.Denomination);
 
         public decimal[] SupportedDenominations => _cashMachine.SupportedDenominations.ToArray();
@@ -89,14 +84,15 @@ namespace CashMachineTask.ViewModel
             return false;
         });
 
-        public IRelayCommand<object> _onSelectionChangedRaiseCanExecute;
-        public IRelayCommand<object> OnSelectionChangedRaiseCanExecute =>
-            _onSelectionChangedRaiseCanExecute ??= new RelayCommand<object>(obj => { Notify(); });
+        public IRelayCommand _onSelectionChangedRaiseCanExecute;
+        public IRelayCommand OnSelectionChangedRaiseCanExecute =>
+            _onSelectionChangedRaiseCanExecute ??= new RelayCommand(() => { Notify(); });
 
         public void Notify()
         {
             PickUp.NotifyCanExecuteChanged();
             Deposit.NotifyCanExecuteChanged();
+            Withdrawal.NotifyCanExecuteChanged();
             OnPropertyChanged(nameof(TrayCashSum));
             OnPropertyChanged(nameof(Info));
         }
@@ -115,49 +111,48 @@ namespace CashMachineTask.ViewModel
             }
         }
 
-        private IRelayCommand<object> _withdrawal;
-        public IRelayCommand<object> Withdrawal => _withdrawal ??= new RelayCommand<object>(obj =>
+        private IRelayCommand _withdrawal;
+        public IRelayCommand Withdrawal => _withdrawal ??= new RelayCommand(() =>
         {
             if (_tray.Count > 0)
             {
                 Status = "Take money from tray before withdrawal.";
+                return;
             }
-            else
+
+            var withdrawnCashList = new List<ICash>();
+            var acceptedDenominations = SupportedDenominations.Where(item => item <= _withdrawalSum).ToArray();
+
+            var dialogViewModel = new SelectorCashDialogViewModel()
             {
-                var withdrawnCashList = new List<ICash>();
-                var acceptedDenominations = SupportedDenominations.Where(item => item <= _withdrawalSum).ToArray();
+                SupportedDenominations = acceptedDenominations,
+                WithdrawalSumString = WithdrawalSumString,
+                PreferDenomination = acceptedDenominations[0]
+            };
 
-                var dialogViewModel = new SelectorCashDialogViewModel()
+            _dialogService.ShowDialog<decimal>(dialogViewModel, (dialogResult, result) =>
+            {
+                if (dialogResult == false)
                 {
-                    SupportedDenominations = acceptedDenominations,
-                    WithdrawalSumString = WithdrawalSumString,
-                    PreferDenomination = acceptedDenominations[0],
-                    Owner = (Window)obj
-                };
-
-                _dialogService.ShowDialog(dialogViewModel, (dialogResult, result) =>
+                    Status = "Operation denied.";
+                }
+                else if (result is decimal preferDenomination &&
+                         _cashMachine.TryWithdrawal(_withdrawalSum, preferDenomination, out withdrawnCashList))
                 {
-                    if (dialogResult == false)
-                    {
-                        Status = "Operation denied.";
-                    }
-                    else if (result is decimal preferDenomination &&
-                             _cashMachine.TryWithdrawal(_withdrawalSum, preferDenomination, out withdrawnCashList))
-                    {
-                        _tray.AddRange(withdrawnCashList);
-                        Status = "Done. Please take your money by tray.";
-                    }
-                    else
-                    {
-                        Status = "Cant do now. Try again or later";
-                    }
-                });
+                    _tray.AddRange(withdrawnCashList);
+                    Status = "Done. Please take your money by tray.";
+                    WithdrawalSumString = "";
+                }
+                else
+                {
+                    Status = "Cant do now. Try again or later";
+                }
+            });
 
-                Notify();
-            }
+            Notify();
         },
 
-        obj =>
+        () =>
         {
             if (decimal.TryParse(WithdrawalSumString, out decimal res) && res >= SupportedDenominations.Min())
             {
