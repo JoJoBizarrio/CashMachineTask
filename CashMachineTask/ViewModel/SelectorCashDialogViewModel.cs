@@ -20,11 +20,11 @@ namespace CashMachineTask.ViewModel
 
         public object Result => PreferDenomination;
 
+        public Window Owner { get; set; }
+
         public void OnDialogOpened(IDialogParametrs parametrs)
         {
-            SupportedDenominations = parametrs.GetValue<decimal[]>(nameof(SupportedDenominations)); // how cut nameof??
-            WithdrawalSumString = parametrs.GetValue<string>(nameof(WithdrawalSumString));
-            PreferDenomination = SupportedDenominations.Min();
+
         }
     }
 }
