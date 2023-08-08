@@ -16,6 +16,16 @@ namespace CashMachineTask.Model
 
 		public CashMachine(IEnumerable<ICassette> cassettes)
 		{
+			if (cassettes == null)
+			{
+                throw new ArgumentNullException("Cassettes is null");
+            }
+
+			if (cassettes.Count() == 0)
+			{
+				throw new ArgumentException("Cassettes is empty");
+			}
+
 			if (cassettes.GroupBy(item => item.StoredDenomination).ToArray().Count() != cassettes.Count())
 			{
 				throw new ArgumentException("One cassette = One denomination");
