@@ -50,6 +50,8 @@
                      Text="{Binding TrayCashSum, Mode=OneWay}"
                      IsReadOnly="True"
                      Width="150"></TextBox>
+
+            <Button x:Name="PullAllButton" Content="Pull all" Command="{Binding PullAll}" />
         </StackPanel>
 
         <TabControl x:Name="ActionsTabControl"  Grid.Row="3" Margin="3">
@@ -57,8 +59,7 @@
             <TabItem x:Name="DepositTabItem" Header="Depositing">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Button x:Name="DepositButton" Content="Deposit" Command="{Binding Deposit}" />
-                        <Button x:Name="PullAllButton" Content="Pull all" Command="{Binding PullAll}" />
+                        <Button x:Name="DepositButton" Content="Deposit" Command="{Binding Deposit}" Width="150" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal">
