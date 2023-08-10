@@ -6,153 +6,161 @@ using System.Text;
 
 namespace CashMachineTask.Model
 {
-	internal class CashMachine : ICashMachine
-	{
-		public decimal Balance => _cassettes.Sum(cassette => cassette.Balance);
+    internal class CashMachine : ICashMachine
+    {
+        public decimal Balance => _cassettes.Sum(cassette => cassette.Balance);
 
-		public IEnumerable<decimal> SupportedDenominations => _cassettes.Select(item => item.StoredDenomination).OrderBy(x => x).ToHashSet().ToArray();
+        public IEnumerable<decimal> SupportedDenominations => _cassettes.Select(item => item.StoredDenomination).OrderBy(x => x).ToHashSet().ToArray();
 
-		private readonly List<ICassette> _cassettes;
+        private readonly List<ICassette> _cassettes;
 
-		public CashMachine(IEnumerable<ICassette> cassettes)
-		{
-			if (cassettes == null)
-			{
+        public CashMachine(IEnumerable<ICassette> cassettes)
+        {
+            if (cassettes == null)
+            {
                 throw new ArgumentNullException("Cassettes is null");
             }
 
-			if (cassettes.Count() == 0)
-			{
-				throw new ArgumentException("Cassettes is empty");
-			}
+            if (cassettes.Count() == 0)
+            {
+                throw new ArgumentException("Cassettes is empty");
+            }
 
-			if (cassettes.GroupBy(item => item.StoredDenomination).ToArray().Count() != cassettes.Count())
-			{
-				throw new ArgumentException("One cassette = One denomination");
-			}
+            if (cassettes.GroupBy(item => item.StoredDenomination).ToArray().Count() != cassettes.Count())
+            {
+                throw new ArgumentException("One cassette = One denomination");
+            }
 
-			_cassettes = cassettes.ToList();
-		}
+            _cassettes = cassettes.ToList();
+        }
 
-		#region deposit
-		public bool TryDeposit(IEnumerable<ICash> cash)
-		{
-			var cashGroupByDenomination = cash.GroupBy(item => item.Denomination).ToArray();
+        #region deposit
+        public bool TryDeposit(IEnumerable<ICash> cash)
+        {
+            var cashGroupByDenomination = cash.GroupBy(item => item.Denomination).ToArray();
 
-			if (!CanDeposit(cashGroupByDenomination))
-			{
-				return false;
-			};
+            if (!CanDeposit(cashGroupByDenomination))
+            {
+                return false;
+            };
 
-			for (int i = 0; i < cashGroupByDenomination.Length; i++)
-			{
-				_cassettes.First(item => item.StoredDenomination == cashGroupByDenomination[i].Key).Deposite(cashGroupByDenomination[i]);
-			}
+            for (int i = 0; i < cashGroupByDenomination.Length; i++)
+            {
+                _cassettes.First(item => item.StoredDenomination == cashGroupByDenomination[i].Key).Deposite(cashGroupByDenomination[i]);
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		public bool CanDeposit(IEnumerable<ICash> cash)
-		{
-			var cashGroupByDenomination = cash.GroupBy(item => item.Denomination).ToArray();
+        public bool CanDeposit(IEnumerable<ICash> cash)
+        {
+            var cashGroupByDenomination = cash.GroupBy(item => item.Denomination).ToArray();
 
-			for (int i = 0; i < cashGroupByDenomination.Length; i++)
-			{
-				if (!_cassettes.First(item => item.StoredDenomination == cashGroupByDenomination[i].Key).CanDeposit(cashGroupByDenomination[i]))
-				{
-					return false;
-				};
-			}
+            for (int i = 0; i < cashGroupByDenomination.Length; i++)
+            {
+                if (!_cassettes.First(item => item.StoredDenomination == cashGroupByDenomination[i].Key).CanDeposit(cashGroupByDenomination[i]))
+                {
+                    return false;
+                };
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		private bool CanDeposit(IGrouping<decimal, ICash>[] cashGroupByDenomination)
-		{
-			return cashGroupByDenomination.Select(item => CanDeposit(item)).All(item => item);
-		}
+        private bool CanDeposit(IGrouping<decimal, ICash>[] cashGroupByDenomination)
+        {
+            return cashGroupByDenomination.Select(item => CanDeposit(item)).All(item => item);
+        }
 
-		private bool CanDeposit(IGrouping<decimal, ICash> cashGroupByDenomination)
-		{
-			return _cassettes.First(item => item.StoredDenomination == cashGroupByDenomination.Key).CanDeposit(cashGroupByDenomination);
-		}
-		#endregion
+        private bool CanDeposit(IGrouping<decimal, ICash> cashGroupByDenomination)
+        {
+            return _cassettes.First(item => item.StoredDenomination == cashGroupByDenomination.Key).CanDeposit(cashGroupByDenomination);
+        }
+        #endregion
 
-		#region withdrawal
-		public bool TryWithdrawal(decimal totalSum, out List<ICash> cashes)
-		{
-			return TryWithdrawal(totalSum, SupportedDenominations.ToArray(), out cashes);
-		}
+        #region withdrawal
+        public bool TryWithdrawal(decimal totalSum, out List<ICash> cashes)
+        {
+            return TryWithdrawal(totalSum, SupportedDenominations.ToArray(), out cashes);
+        }
 
-		public bool TryWithdrawal(decimal totalSum, decimal preferDenomination, out List<ICash> cashes)
-		{
-			cashes = new List<ICash>();
+        public bool TryWithdrawal(decimal totalSum, decimal preferDenomination, out List<ICash> cashes)
+        {
+            var denomination = SupportedDenominations.Where(item => item <= preferDenomination).OrderByDescending(item => item).ToArray();
 
-			var denomination = SupportedDenominations.Where(item => item <= preferDenomination).OrderByDescending(item => item).ToArray();
+            return TryWithdrawal(totalSum, denomination, out cashes);
+        }
 
-			return TryWithdrawal(totalSum, denomination, out cashes);
-		}
+        private bool TryWithdrawal(decimal totalSum, decimal[] denomination, out List<ICash> cashes)
+        {
+            if (totalSum > Balance)
+            {
+                cashes = null;
+                return false;
+            }
 
-		private bool TryWithdrawal(decimal totalSum, decimal[] denomination, out List<ICash> cashes)
-		{
-			cashes = new List<ICash>();
+            var length = denomination.Length;
+            var cashesCount = 0;
+            var sumResidual = totalSum;
+            var denominationKeyCountValueDictionary = new Dictionary<decimal, int>();
+            ICassette cassette;
 
-			if (totalSum > Balance)
-			{
-				return false;
-			}
+            for (int i = 0; i < length; i++)
+            {
+                cashesCount = 0;
+                cashesCount = (int)(sumResidual / denomination[i]);
 
-			var length = denomination.Length;
-			var cashCount = 0;
-			var current = totalSum;
-			var denominationKeyCountValueDictionary = new Dictionary<decimal, int>();
+                cassette = _cassettes.First(item => item.StoredDenomination == denomination[i]);
 
-			for (int i = 0; i < length; i++)
-			{
-				cashCount = 0;
-				cashCount = (int)(current / denomination[i]);
-				current -= denomination[i] * cashCount;
+                if (cassette.Quantity >= cashesCount)
+                {
+                    denominationKeyCountValueDictionary.Add(denomination[i], cashesCount);
+                    sumResidual -= denomination[i] * cashesCount;
+                }
+                else
+                {
+                    denominationKeyCountValueDictionary.Add(denomination[i], cassette.Quantity);
+                    sumResidual -= denomination[i] * cassette.Quantity;
+                }
+            }
 
-				if (_cassettes.First(item => item.StoredDenomination == denomination[i]).Quantity >= cashCount)
-				{
-					denominationKeyCountValueDictionary.Add(denomination[i], cashCount);
-				}
-				else
-				{
-					cashes = null;
-					return false;
-				}
-			}
+            if (sumResidual > 0)
+            {
+                cashes = null;
+                return false;
+            }
 
-			foreach (var key in denominationKeyCountValueDictionary)
-			{
-				cashes.AddRange(_cassettes.First(item => item.StoredDenomination == key.Key).Withdrawal(key.Value));
-			}
+            cashes = new List<ICash>();
 
-			return true;
-		}
-		#endregion
+            foreach (var key in denominationKeyCountValueDictionary)
+            {
+                cashes.AddRange(_cassettes.First(item => item.StoredDenomination == key.Key).Withdrawal(key.Value));
+            }
 
-		#region by object
-		public override string ToString()
-		{
-			StringBuilder stringBuilder = new StringBuilder();
+            return true;
+        }
+        #endregion
 
-			stringBuilder.Append("Total balance: ");
-			stringBuilder.AppendLine(Balance.ToString());
-			stringBuilder.AppendLine();
+        #region by object
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
 
-			stringBuilder.AppendLine("Balance by denomination:");
+            stringBuilder.Append("Total balance: ");
+            stringBuilder.AppendLine(Balance.ToString());
+            stringBuilder.AppendLine();
 
-			var cassettesCount = _cassettes.Count();
+            stringBuilder.AppendLine("Balance by denomination:");
 
-			for (int i = 0; i < cassettesCount; i++)
-			{
-				stringBuilder.AppendLine(_cassettes[i].ToString());
-			}
+            var cassettesCount = _cassettes.Count();
 
-			return stringBuilder.ToString();
-		}
-		#endregion
-	}
+            for (int i = 0; i < cassettesCount; i++)
+            {
+                stringBuilder.AppendLine(_cassettes[i].ToString());
+            }
+
+            return stringBuilder.ToString();
+        }
+        #endregion
+    }
 }

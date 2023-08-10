@@ -120,7 +120,6 @@ namespace CashMachineTask.ViewModel
                 return;
             }
 
-            var withdrawnCashList = new List<ICash>();
             var acceptedDenominations = SupportedDenominations.Where(item => item <= _withdrawalSum).ToArray();
 
             var dialogViewModel = new SelectorCashDialogViewModel()
@@ -137,7 +136,7 @@ namespace CashMachineTask.ViewModel
                     Status = "Operation denied.";
                 }
                 else if (result is decimal preferDenomination &&
-                         _cashMachine.TryWithdrawal(_withdrawalSum, preferDenomination, out withdrawnCashList))
+                         _cashMachine.TryWithdrawal(_withdrawalSum, preferDenomination, out var withdrawnCashList))
                 {
                     _tray.AddRange(withdrawnCashList);
                     Status = "Done. Please take your money by tray.";
