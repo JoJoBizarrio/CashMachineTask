@@ -18,8 +18,8 @@ namespace CashMachineTask.Model
 		{
 			if (cassettes == null)
 			{
-                throw new ArgumentNullException("Cassettes is null");
-            }
+				throw new ArgumentNullException("Cassettes is null");
+			}
 
 			if (cassettes.Count() == 0)
 			{
@@ -39,7 +39,7 @@ namespace CashMachineTask.Model
 		{
 			var cashGroupByDenomination = cash.GroupBy(item => item.Denomination).ToArray();
 
-			if (!CanDeposit(cashGroupByDenomination))
+			if (!CanDepositInternal(cashGroupByDenomination))
 			{
 				return false;
 			};
@@ -52,48 +52,26 @@ namespace CashMachineTask.Model
 			return true;
 		}
 
-		public bool CanDeposit(IEnumerable<ICash> cash)
+		private bool CanDepositInternal(IGrouping<decimal, ICash>[] cashGroupByDenomination)
 		{
-			var cashGroupByDenomination = cash.GroupBy(item => item.Denomination).ToArray();
-
-			for (int i = 0; i < cashGroupByDenomination.Length; i++)
-			{
-				if (!_cassettes.First(item => item.StoredDenomination == cashGroupByDenomination[i].Key).CanDeposit(cashGroupByDenomination[i]))
-				{
-					return false;
-				};
-			}
-
-			return true;
+			return cashGroupByDenomination.Select(item => CanDepositInternal(item)).All(item => item);
 		}
 
-		private bool CanDeposit(IGrouping<decimal, ICash>[] cashGroupByDenomination)
-		{
-			return cashGroupByDenomination.Select(item => CanDeposit(item)).All(item => item);
-		}
-
-		private bool CanDeposit(IGrouping<decimal, ICash> cashGroupByDenomination)
+		private bool CanDepositInternal(IGrouping<decimal, ICash> cashGroupByDenomination)
 		{
 			return _cassettes.First(item => item.StoredDenomination == cashGroupByDenomination.Key).CanDeposit(cashGroupByDenomination);
 		}
 		#endregion
 
 		#region withdrawal
-		public bool TryWithdrawal(decimal totalSum, out List<ICash> cashes)
-		{
-			return TryWithdrawal(totalSum, SupportedDenominations.ToArray(), out cashes);
-		}
-
 		public bool TryWithdrawal(decimal totalSum, decimal preferDenomination, out List<ICash> cashes)
 		{
-			cashes = new List<ICash>();
-
 			var denomination = SupportedDenominations.Where(item => item <= preferDenomination).OrderByDescending(item => item).ToArray();
 
-			return TryWithdrawal(totalSum, denomination, out cashes);
+			return TryWithdrawalInternal(totalSum, denomination, out cashes);
 		}
 
-		private bool TryWithdrawal(decimal totalSum, decimal[] denomination, out List<ICash> cashes)
+		private bool TryWithdrawalInternal(decimal totalSum, decimal[] denomination, out List<ICash> cashes)
 		{
 			cashes = new List<ICash>();
 
