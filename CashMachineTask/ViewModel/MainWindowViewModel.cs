@@ -114,12 +114,6 @@ namespace CashMachineTask.ViewModel
         private IRelayCommand _withdrawal;
         public IRelayCommand Withdrawal => _withdrawal ??= new RelayCommand(() =>
         {
-            if (_tray.Count > 0)
-            {
-                Status = "Take money from tray before withdrawal.";
-                return;
-            }
-
             var withdrawnCashList = new List<ICash>();
             var acceptedDenominations = SupportedDenominations.Where(item => item <= _withdrawalSum).ToArray();
 
