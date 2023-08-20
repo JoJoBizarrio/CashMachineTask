@@ -69,5 +69,19 @@ namespace CashMachineTask.Model
 			_storege.RemoveRange(0, cashesCount);
 			return list;
 		}
+
+		public override string ToString()
+		{
+			StringBuilder stringBuilder = new StringBuilder();
+
+			stringBuilder.Append("Stored denomination: ");
+			stringBuilder.Append(StoredDenomination);
+			stringBuilder.Append("; ");
+
+			stringBuilder.Append("Occupancy: ");
+			stringBuilder.Append($"{Quantity} of {Capacity};");
+
+			return stringBuilder.ToString();
+		}
 	}
 }

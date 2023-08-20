@@ -23,7 +23,7 @@ namespace CashMachineTask
 
 			MainWindow mainWindow = new MainWindow();
 
-			var cassettesList = new List<Cassette>() { new Cassette(100, 2, 200), new Cassette(500, 5, 3000) };
+			var cassettesList = new List<Cassette>() { new Cassette(200, 2, 200), new Cassette(500, 5, 3000) };
 			var cashMachine = new CashMachine(cassettesList);
 
 			var dialogService = new DialogService();
