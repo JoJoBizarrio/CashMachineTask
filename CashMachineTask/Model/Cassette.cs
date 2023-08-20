@@ -9,10 +9,8 @@ namespace CashMachineTask.Model
 	internal class Cassette : ICassette
 	{
 		public decimal StoredDenomination { get; }
-
 		public int Quantity => _storege.Count;
 		public int Capacity => _storege.Capacity;
-		public bool IsFull => Quantity == Capacity;
 		public decimal Balance => Quantity * StoredDenomination;
 
 		private List<ICash> _storege { get; set; }
@@ -32,36 +30,6 @@ namespace CashMachineTask.Model
 			}
 
 			StoredDenomination = denomination;
-		}
-
-		public Cassette(IEnumerable<ICash> cashes, decimal denomination, int capacity)
-		{
-			if (cashes.Count() > capacity)
-			{
-				throw new ArgumentException("Inserted cashes count is more than capacity of cassette.", nameof(cashes));
-			}
-
-			if (cashes.Any(cash => cash.Denomination != denomination))
-			{
-				throw new ArgumentException("Cashes denomination is difference by specified.", nameof(denomination));
-			}
-
-			_storege = (List<ICash>)cashes;
-			StoredDenomination = denomination;
-		}
-
-		public override string ToString()
-		{
-			StringBuilder stringBuilder = new StringBuilder();
-
-			stringBuilder.Append("Stored denomination: ");
-			stringBuilder.Append(StoredDenomination);
-			stringBuilder.Append("; ");
-
-			stringBuilder.Append("Occupancy: ");
-			stringBuilder.Append($"{Quantity} of {Capacity};");
-
-			return stringBuilder.ToString();
 		}
 
 		public bool CanDeposit(IEnumerable<ICash> cashes)

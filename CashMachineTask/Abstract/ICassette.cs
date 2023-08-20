@@ -6,7 +6,6 @@ namespace CashMachineTask.Abstract
 	{
 		int Quantity { get; }
 		int Capacity { get; }
-		bool IsFull { get; }
 		decimal Balance { get; }
 		decimal StoredDenomination { get; }
 
