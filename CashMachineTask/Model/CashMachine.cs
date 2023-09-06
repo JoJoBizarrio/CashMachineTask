@@ -103,25 +103,34 @@ namespace CashMachineTask.Model
             var cashesCount = 0;
             var sumResidual = totalSum;
             var denominationKeyCountValueDictionary = new Dictionary<decimal, int>();
+            var i = 0;
             ICassette cassette;
 
-            for (int i = 0; i < length; i++)
+            while (sumResidual != 0 && i != length)
             {
-                cashesCount = 0;
-                cashesCount = (int)(sumResidual / denomination[i]);
+                sumResidual = totalSum;
+                denominationKeyCountValueDictionary.Clear();
 
-                cassette = _cassettes.First(item => item.StoredDenomination == denomination[i]);
+                for (int j = i; j < length && sumResidual != 0; j++)
+                {
+                    cashesCount = 0;
+                    cashesCount = (int)(sumResidual / denomination[j]);
 
-                if (cassette.Quantity >= cashesCount)
-                {
-                    denominationKeyCountValueDictionary.Add(denomination[i], cashesCount);
-                    sumResidual -= denomination[i] * cashesCount;
+                    cassette = _cassettes.First(item => item.StoredDenomination == denomination[j]);
+
+                    if (cassette.Quantity >= cashesCount)
+                    {
+                        denominationKeyCountValueDictionary.Add(denomination[j], cashesCount);
+                        sumResidual -= denomination[j] * cashesCount;
+                    }
+                    else
+                    {
+                        denominationKeyCountValueDictionary.Add(denomination[j], cassette.Quantity);
+                        sumResidual -= denomination[j] * cassette.Quantity;
+                    }
                 }
-                else
-                {
-                    denominationKeyCountValueDictionary.Add(denomination[i], cassette.Quantity);
-                    sumResidual -= denomination[i] * cassette.Quantity;
-                }
+
+                i++;
             }
 
             if (sumResidual > 0)
